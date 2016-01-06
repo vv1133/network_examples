@@ -15,6 +15,7 @@
 		exit(EXIT_FAILURE); \
 	} while (0)
 
+//#define SHUTDOWN
 int main(void)
 {
 	int listenfd;
@@ -53,6 +54,19 @@ int main(void)
 		int writelen;
 		writelen = send(conn, buf, len, 0);
 		printf("writelen = %d\n", writelen);
+		
+#ifdef SHUTDOWN
+		int ret = shutdown(conn, SHUT_WR);
+		printf("shutdown ret %d\n", ret);
+
+		int readlen;
+		while (1) {
+			readlen = recv(conn, buf, len, 0);
+			if (readlen == 0)
+				break;
+		}
+#endif
+
 		close(conn);
 		printf("close\n");
 	}
