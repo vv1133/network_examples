@@ -8,6 +8,7 @@
 #include<netinet/in.h>
 #include<string.h>
 #include<unistd.h>
+#include<netinet/tcp.h>
 
 #define ERR_EXIT(m) \
 	do { \
@@ -64,20 +65,25 @@ int main(int argc, char *argv[])
 		ERR_EXIT("connect error");
 
 	int writelen, readlen;
+	int on = 1;
 
 	if (option == OPTION_NORMAL) {
 		printf("write...\n");
-		writelen = send(sock, buffer, size, 0);
+		writelen = send(sock, buffer, size/2, 0);
 		usleep(100);
 		printf("write...\n");
-		writelen = send(sock, buffer, size, 0);
+		writelen = send(sock, buffer+size/2, size/2, 0);
 	} else if (option == OPTION_BUFFERING) {
 		printf("write...\n");
 		writelen = send(sock, buffer, size, 0);
 	} else if (option == OPTION_NO_DELAY) {
 		printf("set tcp nodelay\n");
+		setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (void *)&on, sizeof(on));
 		printf("write...\n");
-		writelen = send(sock, buffer, size, 0);
+		writelen = send(sock, buffer, size/2, 0);
+		usleep(100);
+		printf("write...\n");
+		writelen = send(sock, buffer+size/2, size/2, 0);
 	}
 
 	printf("read...\n");
