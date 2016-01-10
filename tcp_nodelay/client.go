@@ -29,6 +29,12 @@ func main() {
 		fmt.Println("Fatal error.")
 		os.Exit(1)
 	}
+	fmt.Println("Write...")
+	_, err = conn.Write(buf)
+	if err != nil {
+		fmt.Println("Fatal error.")
+		os.Exit(1)
+	}
 	_, err = conn.Read(buf)
 	if err != nil {
 		fmt.Println("Fatal error.")
