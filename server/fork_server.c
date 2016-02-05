@@ -19,7 +19,7 @@ void do_service(int);
 
 int main(void)
 {
-	//signal(SIGCHLD, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN);
 	int listenfd;
 	if ((listenfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0)
 		ERR_EXIT("socket error");

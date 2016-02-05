@@ -9,6 +9,7 @@
 #include<string.h>
 #include<signal.h>
 #include<sys/wait.h>
+#include<fcntl.h>
 
 #define ERR_EXIT(m) \
 	do { \
@@ -74,6 +75,9 @@ int main(void)
 			conn = accept(listenfd, (struct sockaddr*)&peeraddr, &peerlen);
 			if (conn == -1)
 				ERR_EXIT("accept error");
+
+			if (fcntl(conn, F_SETFL, O_NONBLOCK) < 0)
+				ERR_EXIT("fcntl error");
 
 			for (i = 0; i < FD_SETSIZE; i++) {
 				if (client[i] < 0) {
@@ -142,9 +146,3 @@ void do_service(int conn)
 	write(conn, "ack\n", 4);
 }
 
-
-/* select所能承受的最大并发数受
- * 1.一个进程所能打开的最大文件描述符数，可以通过ulimit -n来调整
- *   但一个系统所能打开的最大数也是有限的，跟内存有关，可以通过cat /proc/sys/fs/file-max 查看
- * 2.FD_SETSIZE(fd_set)的限制，这个需要重新编译内核                                                                          
- */
